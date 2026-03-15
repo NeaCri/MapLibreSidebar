@@ -1,11 +1,14 @@
 ﻿<div id="sidebar" class="sidebar collapsed sidebar-left">
   <div class="sidebar-tabs">
-    <ul role="tablist">
+    <!-- Top tab group -->
+    <ul class="sidebar-tabs-top" role="tablist" aria-label="Primary tabs">
       <li class="active"><a href="#home" role="tab" title="Home"><i class="fa fa-home"></i></a></li>
       <li><a href="#layers" role="tab" title="Layers"><i class="fa fa-layer-group"></i></a></li>
       <li><a href="#legend" role="tab" title="Legend"><i class="fa fa-map"></i></a></li>
     </ul>
-    <ul role="tablist">
+
+    <!-- Bottom tab group -->
+    <ul class="sidebar-tabs-bottom" role="tablist" aria-label="Secondary tabs">
       <li><a href="#about" role="tab" title="About"><i class="fa fa-info-circle"></i></a></li>
     </ul>
   </div>

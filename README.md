@@ -17,7 +17,7 @@ Upstream lineage includes Turbo87 sidebar projects:
 
 - `maplibreSidebar.js`: core sidebar behavior (tabs, panes, open/close/toggle, custom events)
 - `maplibreSidebar.css`: base sidebar styles only (no project-specific photo/doc UI)
-- `maplibreSidebar.php`: minimal markup template (can be used as plain HTML too)
+- `maplibreSidebar.php`: minimal markup template (can be used as plain HTML too), including two tab groups (`.sidebar-tabs-top` and `.sidebar-tabs-bottom`)
 
 ## Usage
 
