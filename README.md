@@ -55,4 +55,3 @@ Events are dispatched from the sidebar container element:
 
 - Adapted source (`leaflet-sidebar-v2`) is MIT licensed.
 - Keep attribution to upstream projects when redistributing this repository.
-- This repository should include an MIT-compatible license for your own additions.
