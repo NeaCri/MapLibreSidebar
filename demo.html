@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MapLibreSidebar – Demo</title>
+
+  <!-- MapLibre GL JS -->
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.css" />
+  <script src="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.js"></script>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- MapLibreSidebar -->
+  <link rel="stylesheet" href="maplibreSidebar.css" />
+  <script src="maplibreSidebar.js"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    #map {
+      position: absolute;
+      inset: 0;
+    }
+
+    /* ── Status bar ─────────────────────────────────────────── */
+    #status-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 28px;
+      background: rgba(0, 0, 0, 0.65);
+      color: #e0e0e0;
+      font-size: 12px;
+      line-height: 28px;
+      padding: 0 12px;
+      z-index: 3000;
+      pointer-events: none;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ── Sidebar demo content ───────────────────────────────── */
+    .pane-section {
+      margin-bottom: 18px;
+    }
+
+    .pane-section h4 {
+      margin: 0 0 6px;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #555;
+    }
+
+    .pane-section p {
+      margin: 0;
+      font-size: 14px;
+      color: #333;
+      line-height: 1.5;
+    }
+
+    /* Layer toggle list */
+    .layer-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .layer-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 14px;
+    }
+
+    .layer-list li:last-child {
+      border-bottom: none;
+    }
+
+    .layer-list input[type="checkbox"] {
+      accent-color: #0074d9;
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    /* Legend swatches */
+    .legend-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .legend-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 5px 0;
+      font-size: 14px;
+    }
+
+    .swatch {
+      width: 20px;
+      height: 14px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    /* API / event log */
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .btn {
+      padding: 6px 12px;
+      border: 1px solid #0074d9;
+      border-radius: 4px;
+      background: #fff;
+      color: #0074d9;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .btn:hover {
+      background: #0074d9;
+      color: #fff;
+    }
+
+    #event-log {
+      background: #f5f5f5;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 8px 10px;
+      height: 140px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 12px;
+      color: #333;
+    }
+
+    #event-log p {
+      margin: 0 0 4px;
+    }
+
+    #event-log p:last-child {
+      margin-bottom: 0;
+    }
+
+    .log-open  { color: #0074d9; }
+    .log-close { color: #c0392b; }
+    .log-change { color: #27ae60; }
+  </style>
+</head>
+<body>
+
+  <!-- Map -->
+  <div id="map"></div>
+
+  <!-- Sidebar -->
+  <div id="sidebar" class="sidebar collapsed sidebar-left">
+    <div class="sidebar-tabs">
+
+      <!-- Top tabs -->
+      <ul class="sidebar-tabs-top" role="tablist" aria-label="Primary tabs">
+        <li class="active">
+          <a href="#home" role="tab" title="Home"><i class="fa fa-house"></i></a>
+        </li>
+        <li>
+          <a href="#layers" role="tab" title="Layers"><i class="fa fa-layer-group"></i></a>
+        </li>
+        <li>
+          <a href="#legend" role="tab" title="Legend"><i class="fa fa-map"></i></a>
+        </li>
+        <li>
+          <a href="#api" role="tab" title="API Demo"><i class="fa fa-code"></i></a>
+        </li>
+      </ul>
+
+      <!-- Bottom tabs -->
+      <ul class="sidebar-tabs-bottom" role="tablist" aria-label="Secondary tabs">
+        <li>
+          <a href="#about" role="tab" title="About"><i class="fa fa-circle-info"></i></a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="sidebar-content">
+
+      <!-- Home pane -->
+      <div id="home" class="sidebar-pane">
+        <h3 class="sidebar-header">
+          Home
+          <span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
+        </h3>
+
+        <div class="pane-section">
+          <h4>Welcome</h4>
+          <p>
+            This is a live demo of <strong>MapLibreSidebar</strong> — a minimal, reusable
+            sidebar component for MapLibre GL JS projects.
+          </p>
+        </div>
+
+        <div class="pane-section">
+          <h4>Features</h4>
+          <p>
+            Click the icons on the left to switch between panes. Click the active
+            icon again (or the ‹ close button) to collapse the sidebar.
+          </p>
+        </div>
+
+        <div class="pane-section">
+          <h4>Quick start</h4>
+          <pre style="background:#f5f5f5;padding:10px;border-radius:4px;font-size:12px;overflow-x:auto;">const sidebar = new MaplibreSidebar({
+  container: '#sidebar',
+  position: 'left',
+  map: map,
+  autopan: true
+});
+sidebar.open('home');</pre>
+        </div>
+      </div>
+
+      <!-- Layers pane -->
+      <div id="layers" class="sidebar-pane">
+        <h3 class="sidebar-header">
+          Layers
+          <span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
+        </h3>
+
+        <div class="pane-section">
+          <h4>Visible layers</h4>
+          <ul class="layer-list">
+            <li><input type="checkbox" id="l-streets" checked /><label for="l-streets">Streets</label></li>
+            <li><input type="checkbox" id="l-terrain" checked /><label for="l-terrain">Terrain</label></li>
+            <li><input type="checkbox" id="l-buildings" /><label for="l-buildings">3-D Buildings</label></li>
+            <li><input type="checkbox" id="l-transit" /><label for="l-transit">Transit</label></li>
+            <li><input type="checkbox" id="l-satellite" /><label for="l-satellite">Satellite imagery</label></li>
+          </ul>
+        </div>
+
+        <div class="pane-section">
+          <h4>Opacity</h4>
+          <label style="font-size:13px;display:flex;align-items:center;gap:10px;">
+            Base layer
+            <input type="range" min="0" max="100" value="100" style="flex:1;" />
+          </label>
+        </div>
+      </div>
+
+      <!-- Legend pane -->
+      <div id="legend" class="sidebar-pane">
+        <h3 class="sidebar-header">
+          Legend
+          <span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
+        </h3>
+
+        <div class="pane-section">
+          <h4>Land use</h4>
+          <ul class="legend-list">
+            <li><span class="swatch" style="background:#a8d5a2;" aria-label="Light green"></span>Residential</li>
+            <li><span class="swatch" style="background:#f9c784;" aria-label="Light orange"></span>Commercial</li>
+            <li><span class="swatch" style="background:#9dc3e6;" aria-label="Light blue"></span>Water</li>
+            <li><span class="swatch" style="background:#c5e0b4;" aria-label="Light green"></span>Parks &amp; open space</li>
+            <li><span class="swatch" style="background:#d6b4a4;" aria-label="Light brown"></span>Industrial</li>
+          </ul>
+        </div>
+
+        <div class="pane-section">
+          <h4>Transport</h4>
+          <ul class="legend-list">
+            <li><span class="swatch" style="background:#e63946;" aria-label="Red"></span>Motorway</li>
+            <li><span class="swatch" style="background:#f4a261;" aria-label="Orange"></span>Primary road</li>
+            <li><span class="swatch" style="background:#adb5bd;" aria-label="Grey"></span>Secondary road</li>
+            <li><span class="swatch" style="background:#0074d9;" aria-label="Blue"></span>Rail / transit</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- API Demo pane -->
+      <div id="api" class="sidebar-pane">
+        <h3 class="sidebar-header">
+          API Demo
+          <span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
+        </h3>
+
+        <div class="pane-section">
+          <h4>Control the sidebar programmatically</h4>
+          <div class="btn-row">
+            <button class="btn" onclick="sidebar.open('home')">open('home')</button>
+            <button class="btn" onclick="sidebar.open('layers')">open('layers')</button>
+            <button class="btn" onclick="sidebar.close()">close()</button>
+            <button class="btn" onclick="sidebar.toggle('legend')">toggle('legend')</button>
+          </div>
+        </div>
+
+        <div class="pane-section">
+          <h4>Emitted events</h4>
+          <div id="event-log"><p style="color:#999;">Events will appear here…</p></div>
+        </div>
+      </div>
+
+      <!-- About pane -->
+      <div id="about" class="sidebar-pane">
+        <h3 class="sidebar-header">
+          About
+          <span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
+        </h3>
+
+        <div class="pane-section">
+          <h4>MapLibreSidebar</h4>
+          <p>
+            Minimal, reusable sidebar component extracted for
+            <a href="https://maplibre.org" target="_blank" rel="noopener">MapLibre GL JS</a>
+            projects.
+          </p>
+        </div>
+
+        <div class="pane-section">
+          <h4>Attribution</h4>
+          <p>
+            Adapted from
+            <a href="https://github.com/noerw/leaflet-sidebar-v2" target="_blank" rel="noopener">noerw/leaflet-sidebar-v2</a>,
+            which is MIT licensed. Upstream lineage includes
+            <a href="https://github.com/Turbo87/sidebar-v2" target="_blank" rel="noopener">Turbo87/sidebar-v2</a>.
+          </p>
+        </div>
+
+        <div class="pane-section">
+          <h4>Source</h4>
+          <p>
+            <a href="https://github.com/NeaCri/MapLibreSidebar" target="_blank" rel="noopener">
+              github.com/NeaCri/MapLibreSidebar
+            </a>
+          </p>
+        </div>
+      </div>
+
+    </div><!-- /.sidebar-content -->
+  </div><!-- /#sidebar -->
+
+  <!-- Status bar -->
+  <div id="status-bar">Sidebar: collapsed</div>
+
+  <script>
+    /* ── Map ──────────────────────────────────────────────────── */
+    var map = new maplibregl.Map({
+      container: 'map',
+      style: 'https://demotiles.maplibre.org/style.json',
+      center: [0, 20],
+      zoom: 1.5
+    });
+
+    /* ── Sidebar ──────────────────────────────────────────────── */
+    var sidebar = new MaplibreSidebar({
+      container: '#sidebar',
+      position: 'left',
+      map: map,
+      autopan: true
+    });
+
+    /* Open the Home pane on load */
+    map.on('load', function () {
+      sidebar.open('home');
+    });
+
+    /* ── Event log ────────────────────────────────────────────── */
+    var logEl = document.getElementById('event-log');
+    var statusBar = document.getElementById('status-bar');
+
+    function appendLog(cls, text) {
+      /* Remove placeholder text on first real event */
+      if (logEl.querySelector('p[style]')) {
+        logEl.innerHTML = '';
+      }
+      var p = document.createElement('p');
+      p.className = cls;
+      p.textContent = text;
+      logEl.appendChild(p);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    document.getElementById('sidebar').addEventListener('maplibreSidebar:open', function (e) {
+      var d = e.detail;
+      appendLog('log-open', 'open  → id: "' + d.id + '"  (prev: ' + (d.previousId || 'none') + ')');
+      statusBar.textContent = 'Sidebar: open — pane "' + d.id + '"';
+    });
+
+    document.getElementById('sidebar').addEventListener('maplibreSidebar:close', function (e) {
+      var d = e.detail;
+      appendLog('log-close', 'close → prev: ' + (d.previousId || 'none'));
+      statusBar.textContent = 'Sidebar: collapsed';
+    });
+
+    document.getElementById('sidebar').addEventListener('maplibreSidebar:change', function (e) {
+      var d = e.detail;
+      appendLog('log-change', 'change → id: ' + (d.id || 'null') + '  prev: ' + (d.previousId || 'none'));
+    });
+  </script>
+</body>
+</html>
